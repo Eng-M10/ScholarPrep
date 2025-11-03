@@ -57,6 +57,7 @@ const ExamSimulation: React.FC<ExamSimulationProps> = ({ task, onFinish }) => {
         question: q,
         user_answer: userAnswers[i],
         is_correct: q.correct_answer.toLowerCase().trim() === userAnswers[i].toLowerCase().trim(),
+        subject: task.subject,
     }));
     const errors: UserError[] = results.filter((r): r is UserError => !r.is_correct);
     setFinalResults({ answers: results, errors });
@@ -101,7 +102,7 @@ const ExamSimulation: React.FC<ExamSimulationProps> = ({ task, onFinish }) => {
   }
 
   if (!questions.length) {
-    return <div className="text-center p-8">No questions available for this topic yet.</div>
+    return <div className="text-center p-8">Could not generate questions for this topic. Please try again later.</div>
   }
 
   const currentQuestion = questions[currentQuestionIndex];

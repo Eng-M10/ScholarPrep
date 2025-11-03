@@ -28,7 +28,7 @@ export const generateRoadmap = async (
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
-    contents: [{ parts: [{ text: prompt }] }],
+    contents: prompt,
     config: {
       systemInstruction,
       responseMimeType: "application/json",
@@ -90,7 +90,7 @@ export const generateLesson = async (
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
-    contents: [{ parts: [{ text: prompt }] }],
+    contents: prompt,
     config: {
       systemInstruction,
     }
@@ -119,7 +119,7 @@ export const generateQuestions = async (
 
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-flash',
-    contents: [{ parts: [{ text: prompt }] }],
+    contents: prompt,
     config: {
       systemInstruction,
       responseMimeType: "application/json",
@@ -140,5 +140,6 @@ export const generateQuestions = async (
     }
   });
 
-  return JSON.parse(response.text) as Question[];
+  const parsedQuestions = JSON.parse(response.text) as Omit<Question, 'topic_id'>[];
+  return parsedQuestions.map(q => ({ ...q, topic_id: topic }));
 };

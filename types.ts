@@ -25,12 +25,14 @@ export interface Question {
   options?: string[];
   correct_answer: string;
   correct_answer_explanation: string;
+  topic_id: string;
 }
 
 export interface UserAnswer {
   question: Question;
   user_answer: string;
   is_correct: boolean;
+  subject: string;
 }
 
 export interface UserError extends UserAnswer {

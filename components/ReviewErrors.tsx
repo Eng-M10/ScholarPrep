@@ -37,7 +37,7 @@ const ReviewErrors: React.FC<ReviewErrorsProps> = ({ errors, onAnalyzeError, onP
                  <button onClick={() => onAnalyzeError(error)} className="flex-1 bg-amber-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-amber-600 transition-colors text-sm">
                     Analyze My Mistake
                  </button>
-                 <button onClick={() => onPracticeTopic(error.question.question_text, 'Unknown')} className="flex-1 bg-indigo-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-600 transition-colors text-sm">
+                 <button onClick={() => onPracticeTopic(error.question.topic_id, error.subject)} className="flex-1 bg-indigo-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-600 transition-colors text-sm">
                     Practice This Topic
                  </button>
             </div>
