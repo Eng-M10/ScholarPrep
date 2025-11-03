@@ -1,0 +1,5 @@
+{
+  "name": "ScholarPrep - Adaptive Exam Tutor",
+  "description": "An adaptive, generative tutor that creates personalized study roadmaps and dynamic content for college entrance exams based on user-defined subject pairings and past performance data.",
+  "requestFramePermissions": []
+}
