@@ -108,7 +108,7 @@ export const generateQuestions = async (
   difficulty_level: number,
   count: number = 5
 ): Promise<Question[]> => {
-  const systemInstruction = `Generate high-quality, simulated entrance exam questions (MCQs and open-ended) that match the style, difficulty, and format of standard college entrance exams. Structure the output as a JSON array. For MCQs, provide 4 options. Always include a correct answer and a detailed explanation for why it's correct.`;
+  const systemInstruction = `Generate high-quality, simulated entrance exam questions (MCQs and open-ended) that match the style, difficulty, and format of standard college entrance exams. Structure the output as a JSON array. For MCQs, provide 4 options. Always include a correct answer and a detailed explanation for why it's correct. Also, classify each question into one of the following cognitive categories: 'Knowledge & Recall', 'Application & Analysis', or 'Synthesis & Evaluation'.`;
 
   const prompt = `
     Subject: ${subject}
@@ -133,8 +133,9 @@ export const generateQuestions = async (
             options: { type: Type.ARRAY, items: { type: Type.STRING } },
             correct_answer: { type: Type.STRING },
             correct_answer_explanation: { type: Type.STRING },
+            cognitive_category: { type: Type.STRING, description: "Cognitive category: 'Knowledge & Recall', 'Application & Analysis', or 'Synthesis & Evaluation'."}
           },
-          required: ["question_text", "type", "correct_answer", "correct_answer_explanation"]
+          required: ["question_text", "type", "correct_answer", "correct_answer_explanation", "cognitive_category"]
         }
       }
     }

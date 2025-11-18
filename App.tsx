@@ -1,13 +1,14 @@
 
 import React, { useState, useCallback } from 'react';
-import type { AppView, DailyTask, Roadmap, UserAnswer, UserData, UserError, Lesson } from './types';
+import type { AppView, DailyTask, Roadmap, UserAnswer, UserData, UserError } from './types';
 import Onboarding from './components/Onboarding';
 import Dashboard from './components/Dashboard';
 import ExamSimulation from './components/ExamSimulation';
 import LessonView from './components/LessonView';
 import ReviewErrors from './components/ReviewErrors';
+import PerformanceInsights from './components/PerformanceInsights';
 import { generateRoadmap } from './services/geminiService';
-import { GraduationCapIcon } from './components/icons';
+import { GraduationCapIcon, SparklesIcon } from './components/icons';
 
 
 const App: React.FC = () => {
@@ -17,6 +18,7 @@ const App: React.FC = () => {
     const [userData, setUserData] = useState<UserData | null>(null);
     const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
     const [errors, setErrors] = useState<UserError[]>([]);
+    const [allAnswers, setAllAnswers] = useState<UserAnswer[]>([]);
     const [masteryScore, setMasteryScore] = useState(70); // Initial mock score
     const [completionPercentage, setCompletionPercentage] = useState(10); // Initial mock percentage
 
@@ -50,6 +52,7 @@ const App: React.FC = () => {
 
     const handleFinishExam = (results: { answers: UserAnswer[], errors: UserError[] }) => {
         setErrors(prevErrors => [...prevErrors, ...results.errors]);
+        setAllAnswers(prevAnswers => [...prevAnswers, ...results.answers]);
         // Mock update mastery score
         const newScore = Math.min(100, masteryScore + 5 - results.errors.length);
         setMasteryScore(newScore);
@@ -96,6 +99,8 @@ const App: React.FC = () => {
                 return activeTopic ? <LessonView topicId={activeTopic.id} contextualError={activeTopic.context} task={activeTask || undefined} onBack={() => navigateTo('dashboard')} /> : null;
             case 'review':
                 return <ReviewErrors errors={errors} onAnalyzeError={handleAnalyzeError} onPracticeTopic={handlePracticeTopic} />;
+            case 'insights':
+                return <PerformanceInsights allAnswers={allAnswers} errors={errors} />;
             default:
                 return <div>Invalid state</div>;
         }
@@ -111,9 +116,13 @@ const App: React.FC = () => {
                                 <GraduationCapIcon className="w-8 h-8 text-indigo-600"/>
                                 <span className="font-bold text-xl text-slate-800">ScholarPrep</span>
                             </div>
-                            <div className="flex space-x-4">
+                            <div className="flex space-x-1 sm:space-x-2">
                                <button onClick={() => navigateTo('dashboard')} className={`px-3 py-2 rounded-md text-sm font-medium ${view === 'dashboard' ? 'text-indigo-600 bg-indigo-100' : 'text-slate-600 hover:bg-slate-100'}`}>Dashboard</button>
-                               <button onClick={() => navigateTo('review')} className={`px-3 py-2 rounded-md text-sm font-medium ${view === 'review' ? 'text-indigo-600 bg-indigo-100' : 'text-slate-600 hover:bg-slate-100'}`}>Review Errors</button>
+                               <button onClick={() => navigateTo('review')} className={`px-3 py-2 rounded-md text-sm font-medium ${view === 'review' ? 'text-indigo-600 bg-indigo-100' : 'text-slate-600 hover:bg-slate-100'}`}>Revisar Erros</button>
+                               <button onClick={() => navigateTo('insights')} className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${view === 'insights' ? 'text-indigo-600 bg-indigo-100' : 'text-slate-600 hover:bg-slate-100'}`}>
+                                   <SparklesIcon className="w-4 h-4 mr-1.5" />
+                                   Diagnóstico
+                                </button>
                             </div>
                         </div>
                     </div>

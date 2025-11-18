@@ -18,6 +18,8 @@ const ExamSimulation: React.FC<ExamSimulationProps> = ({ task, onFinish }) => {
   const [userAnswers, setUserAnswers] = useState<string[]>([]);
   const [isFinished, setIsFinished] = useState(false);
   const [finalResults, setFinalResults] = useState<{ answers: UserAnswer[], errors: UserError[] } | null>(null);
+  const [questionStartTime, setQuestionStartTime] = useState(0);
+  const [timePerQuestion, setTimePerQuestion] = useState<number[]>([]);
 
   const loadQuestions = useCallback(async () => {
     try {
@@ -25,6 +27,8 @@ const ExamSimulation: React.FC<ExamSimulationProps> = ({ task, onFinish }) => {
       const fetchedQuestions = await generateQuestions(task.subject, task.topic_id, 6, 5);
       setQuestions(fetchedQuestions);
       setUserAnswers(new Array(fetchedQuestions.length).fill(''));
+      setTimePerQuestion(new Array(fetchedQuestions.length).fill(0));
+      setQuestionStartTime(Date.now());
     } catch (error) {
       console.error("Failed to generate questions:", error);
       // Handle error state in UI
@@ -44,24 +48,35 @@ const ExamSimulation: React.FC<ExamSimulationProps> = ({ task, onFinish }) => {
     setUserAnswers(newAnswers);
   };
 
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      submitExam();
-    }
-  };
-  
   const submitExam = () => {
+    const finalTimes = [...timePerQuestion];
+    finalTimes[currentQuestionIndex] = (Date.now() - questionStartTime) / 1000;
+
     const results: UserAnswer[] = questions.map((q, i) => ({
         question: q,
         user_answer: userAnswers[i],
         is_correct: q.correct_answer.toLowerCase().trim() === userAnswers[i].toLowerCase().trim(),
         subject: task.subject,
+        time_taken_seconds: finalTimes[i] || 0,
     }));
     const errors: UserError[] = results.filter((r): r is UserError => !r.is_correct);
     setFinalResults({ answers: results, errors });
     setIsFinished(true);
+  };
+  
+  const handleNext = () => {
+    if (currentQuestionIndex < questions.length - 1) {
+      const timeTaken = (Date.now() - questionStartTime) / 1000;
+      setTimePerQuestion(prev => {
+          const newTimes = [...prev];
+          newTimes[currentQuestionIndex] = timeTaken;
+          return newTimes;
+      });
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setQuestionStartTime(Date.now());
+    } else {
+      submitExam();
+    }
   };
 
   if (isLoading) {
@@ -77,7 +92,10 @@ const ExamSimulation: React.FC<ExamSimulationProps> = ({ task, onFinish }) => {
             <div className="space-y-6">
                 {finalResults.answers.map((result, index) => (
                     <div key={index} className={`p-6 rounded-lg border ${result.is_correct ? 'border-green-300 bg-green-50' : 'border-red-300 bg-red-50'}`}>
-                        <p className="font-semibold text-slate-800 mb-2">{index + 1}. {result.question.question_text}</p>
+                        <div className="flex justify-between items-start">
+                           <p className="font-semibold text-slate-800 mb-2 flex-1">{index + 1}. {result.question.question_text}</p>
+                           <span className="text-xs text-slate-500 ml-4 whitespace-nowrap">{result.time_taken_seconds.toFixed(1)}s</span>
+                        </div>
                         <p className="text-sm">Your answer: <span className={`font-medium ${result.is_correct ? 'text-green-700' : 'text-red-700'}`}>{result.user_answer || "No answer"}</span></p>
                         {!result.is_correct && <p className="text-sm">Correct answer: <span className="font-medium text-green-700">{result.question.correct_answer}</span></p>}
                         <div className="mt-4 p-4 bg-indigo-50 rounded-md border border-indigo-200">

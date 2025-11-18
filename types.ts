@@ -26,6 +26,7 @@ export interface Question {
   correct_answer: string;
   correct_answer_explanation: string;
   topic_id: string;
+  cognitive_category: string;
 }
 
 export interface UserAnswer {
@@ -33,6 +34,7 @@ export interface UserAnswer {
   user_answer: string;
   is_correct: boolean;
   subject: string;
+  time_taken_seconds: number;
 }
 
 export interface UserError extends UserAnswer {
@@ -45,7 +47,7 @@ export interface UserData {
   weaknesses?: string;
 }
 
-export type AppView = 'onboarding' | 'dashboard' | 'exam' | 'lesson' | 'review';
+export type AppView = 'onboarding' | 'dashboard' | 'exam' | 'lesson' | 'review' | 'insights';
 
 export interface Lesson {
     topicId: string;
